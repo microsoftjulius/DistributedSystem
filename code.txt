@@ -1,0 +1,143 @@
+
+//SERVER
+package Prime;
+
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+/**
+ *
+ * @author James
+ */
+public class TryServer extends UnicastRemoteObject implements RMI2{
+    
+    public TryServer() throws RemoteException{
+        
+    super();
+    
+    }
+
+    /**
+     *
+     * @param a
+     * @return
+     * @throws RemoteException
+     */
+    @Override
+    public int prime(int a) throws RemoteException{
+        return a;
+    }
+    
+    public static void main(String[]args) throws RemoteException{
+        try{
+        LocateRegistry.createRegistry(2020);
+            Registry registry =LocateRegistry.getRegistry("192.168.56.1",2020);
+            registry.rebind("It is me", new TryServer()); 
+            System.out.println("Iam ready now");
+        }
+        catch(RemoteException e){
+        System.out.println("Exception"+e);
+        }
+    }
+}
+    
+    // Client
+package Prime;
+
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Scanner;
+
+
+public class ClientTry {
+    
+    public static void main(String[]args) throws RemoteException, NotBoundException{
+       ClientTry c= new ClientTry();
+       c.connectRemote();
+}
+private void connectRemote() throws RemoteException, NotBoundException {
+          Registry reg = LocateRegistry.getRegistry("192.168.56.1", 2020);
+          RMI2 m;
+          //adder ad-reg.lookup("hi server");
+         m =(RMI2)reg.lookup("It is me"); 
+      
+          int a,k=0,line=0,count=0;
+        while(true)
+        {
+        System.out.println("Round" + " " + ++k + ":");
+            Scanner scn = new Scanner(System.in);
+            System.out.print("Enter the search range:");
+            a= scn.nextInt();
+            {
+                if (a< 0)
+                {
+                    System.out.println("End");
+                System.exit(0);
+                }
+            }
+            System.out.println("The Twin Prime Numbers within the given range are : ");
+            for(int i=2; i<=(a-2); i++)
+            {
+                if(isPrime(i) == true && isPrime(i+2) == true)
+                {
+                    System.out.print("("+i+","+(i+2)+") ");
+                    line++;
+                    if(line==2)
+                    {
+                        System.out.println();
+                        line=0;
+                    }
+                    count++;
+
+                }
+
+            }
+            System.out.println();
+            System.out.println("the number of twin prime numbers less than or equal to"+a+"is"+count);
+        }
+    }
+
+     static boolean isPrime(int n) //funton for checking prime
+     {
+         int count=0;
+         for(int i=1; i<=n; i++)
+             {
+                 if(n%i == 0)
+                     count++;
+             }
+        return count == 2;
+     }
+          
+          
+          
+      }
+
+//RMI
+package Prime;
+
+public class RMI1 {
+  
+    public static void main(String[]args){
+    }
+}
+// Interface
+package Prime;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+
+public interface RMI2 extends Remote{
+    
+    
+    
+    
+    
+    
+    public int prime(int a)throws RemoteException;
+    
+}
